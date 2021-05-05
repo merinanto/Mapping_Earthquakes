@@ -45,9 +45,11 @@ function styleInfo(feature) {
     return {
       opacity: 1,
       fillOpacity: 1,
-      fillColor: "#ffae42",
+      //fillColor: "#ffae42",
+      fillColor: getColor(feature.properties.mag),
       color: "#000000",
-      radius: getRadius(),
+      radius: getRadius(feature.properties.mag),
+      //radius: getRadius(),
       stroke: true,
       weight: 0.5
     };
@@ -62,6 +64,26 @@ function getRadius(magnitude) {
     return magnitude * 4;
   }
 
+// This function determines the color of the circle based on the magnitude of the earthquake.
+function getColor(magnitude) {
+    if (magnitude > 5) {
+      return "#ea2c2c";
+    }
+    if (magnitude > 4) {
+      return "#ea822c";
+    }
+    if (magnitude > 3) {
+      return "#ee9c00";
+    }
+    if (magnitude > 2) {
+      return "#eecc00";
+    }
+    if (magnitude > 1) {
+      return "#d4ee00";
+    }
+    return "#98ee00";
+  }
+
 // Accessing the Toronto neighborhoods GeoJSON URL.
 let earthquakePlot = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 // Retrieve the earthquake GeoJSON data.
@@ -74,7 +96,10 @@ d3.json(earthquakePlot).then(function(data) {
                 return L.circleMarker(latlng);
             },
             // We set the style for each circleMarker using our styleInfo function.
-            style: styleInfo
+            style: styleInfo,
+            onEachFeature: function(feature, layer) {
+                layer.bindPopup( "Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+                }
         }).addTo(map);
 });
 
