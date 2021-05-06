@@ -34,8 +34,18 @@ let map = L.map('mapid', {
     layers: [satelliteStreets]
 })
 
-// Pass our map layers into our layers control and add the layers control to the map.
-L.control.layers(baseMaps).addTo(map);
+// Create the earthquake layer for our map.
+let earthquakes = new L.layerGroup();
+
+// We define an object that contains the overlays.
+// This overlay will be visible all the time.
+let overlays = {
+  Earthquakes: earthquakes
+};
+
+// Then we add a control to the map that will allow the user to change
+// which layers are visible.
+L.control.layers(baseMaps, overlays).addTo(map);
 
 
 // This function returns the style data for each of the earthquakes we plot on
@@ -100,6 +110,8 @@ d3.json(earthquakePlot).then(function(data) {
             onEachFeature: function(feature, layer) {
                 layer.bindPopup( "Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
                 }
-        }).addTo(map);
+        }).addTo(earthquakes);
+        //Then we add the earthquake layer to our map.
+        earthquakes.addTo(map);
 });
 
